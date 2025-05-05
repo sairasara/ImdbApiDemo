@@ -62,23 +62,24 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-
     //Retrofit
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-
+    // Moshi Converter for Retrofit
+    implementation (libs.converter.moshi)
+    // Moshi library for JSON parsing and serialization
+    implementation (libs.moshi.kotlin)
     // OkHttp core library
     implementation(libs.okhttp)
-
     // Logging Interceptor
     implementation(libs.logging.interceptor)
-
     //View Model
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-
     // LiveData
     implementation(libs.androidx.lifecycle.livedata.ktx)
-
     //Coroutine
-    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    //navigation
+    implementation(libs.androidx.hilt.navigation.compose)
+    //Load image
+    implementation(libs.coil.compose)
 }

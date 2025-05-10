@@ -12,13 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.saira.imdb.R
 import com.saira.imdb.domain.model.Movie
+import com.saira.imdb.navigation.NavigationItem
 import com.saira.imdb.ui.common.UiState
 import com.saira.imdb.ui.viewmodel.MoviesViewModel
 
@@ -44,58 +46,72 @@ fun MovieListScreen (viewModel: MoviesViewModel = hiltViewModel(),
                      navController: NavController) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val filteredMovies by viewModel.filteredMovies.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("IMDB") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White)
-            )
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .background(MaterialTheme.colorScheme.onBackground)
-        ) {
-            when (uiState) {
-                is UiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFF162936))
+    ) {
+        when (uiState) {
+            is UiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
-                is UiState.Success -> {
-                    val movies = (uiState as UiState.Success<List<Movie>>).data
+            }
+            is UiState.Success -> {
+                //val movies = (uiState as UiState.Success<List<Movie>>).data
 
-                    LazyVerticalGrid(
-                        columns =  GridCells.Adaptive(minSize = 150.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        content = {
-                            items(movies.size) { index ->
-                                MovieItem(
-                                    movie = movies[index],
-                                    onClick = {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { viewModel.onSearchQueryChanged(it) },
+                    label = { Text("Search movies...") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.Yellow,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Yellow,
+                        unfocusedIndicatorColor = Color.Gray)
+                )
 
-                                    }
-                                )
-                            }
+                LazyVerticalGrid(
+                    columns =  GridCells.Adaptive(minSize = 150.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    content = {
+                        items(filteredMovies.size) { index ->
+                            MovieItem(
+                                movie = filteredMovies[index],
+                                onClick = {
+                                    navController.navigate(NavigationItem.MovieDetail.createRoute(filteredMovies[index].id))
+                                }
+                            )
                         }
-                    )
-                }
-                is UiState.Error -> {
-                    val errorMessage = (uiState as UiState.Error).message
-                    Text("Error: $errorMessage")
-                }
+                    }
+                )
+            }
+            is UiState.Error -> {
+                val errorMessage = (uiState as UiState.Error).message
+                Text("Error: $errorMessage")
             }
         }
     }
 }
+
 
 @Composable
 fun MovieItem(movie: Movie,  onClick: () -> Unit) {
@@ -106,7 +122,8 @@ fun MovieItem(movie: Movie,  onClick: () -> Unit) {
             .aspectRatio(0.7f)
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
-    ) {
+           // .clickable(onClick = onClick),
+        ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
             AsyncImage(
@@ -122,8 +139,6 @@ fun MovieItem(movie: Movie,  onClick: () -> Unit) {
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
-
-         //   Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

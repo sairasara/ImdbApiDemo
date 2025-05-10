@@ -22,7 +22,8 @@ object MovieMapper {
             spokenLanguages = movieDto.spokenLanguages ?: emptyList(),
             isAdult = movieDto.isAdult == true,
             type = movieDto.type,
-            url = movieDto.url
+            url = movieDto.url,
+            startYear = movieDto.startYear
         ))
     }
 }

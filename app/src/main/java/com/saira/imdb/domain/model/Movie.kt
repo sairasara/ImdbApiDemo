@@ -17,7 +17,8 @@ data class Movie(
     val spokenLanguages: List<String>,
     val isAdult: Boolean,
     val type: String?,
-    val url: String?
+    val url: String?,
+    val startYear: Int?
 
 //    val averageRating: Double,
 //    val contentRating: String,
@@ -26,5 +27,4 @@ data class Movie(
 //    val filmingLocations: List<String>,
 //    val interests: List<String>,
 //    val numVotes: Int,
-//    val startYear: Int
 )

@@ -80,6 +80,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     //navigation
     implementation(libs.androidx.hilt.navigation.compose)
-    //Load image
+    //Load image - compose support
     implementation(libs.coil.compose)
 }
